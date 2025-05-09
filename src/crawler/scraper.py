@@ -387,8 +387,14 @@ class Scraper:
                     print(f"유효하지 않은 연도 형식: '{year_text}' -> '{current_row_year}'. 건너<0xEB><0x9B><0x84>.")
                     continue
 
-                if current_row_year in target_years:
-                    found_data_for_any_target_year = True
+                # 수정 시작: target_years가 None이거나 비어있으면 모든 연도를 처리, 아니면 필터링
+                process_this_year = True  # 기본적으로 모든 연도 처리
+                if target_years:  # target_years가 None이 아니거나 비어있지 않은 경우에만 필터링
+                    if current_row_year not in target_years:
+                        process_this_year = False
+                
+                if process_this_year:
+                    found_data_for_any_target_year = True # target_years 필터링과 무관하게 데이터 찾았는지 여부
                     revenue_text = cells[COL_IDX_REVENUE].get_text(strip=True)
                     operating_profit_text = cells[COL_IDX_OPERATING_PROFIT].get_text(strip=True)
                     revenue = sanitize_figure(revenue_text)
@@ -437,9 +443,6 @@ class Scraper:
     async def scrape_companies_with_financials(self, search_query: str, search_type: str = "business_registration_number", target_years: list[str] | None = None, max_pages: int = 1) -> list[CompanyData]:
         # 각 회사 검색 시도 전에 비공개 팝업 플래그 리셋
         self.detected_private_company_popup = False
-        
-        if target_years is None:
-            target_years = ["2024", "2023", "2022"]
         
         all_companies_data: list[CompanyData] = []
 
