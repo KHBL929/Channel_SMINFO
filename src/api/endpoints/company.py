@@ -104,8 +104,8 @@ async def get_company_financials_by_brn(
             print("SMINFO 로그인 성공. 정보 스크래핑 시작...")
             scraper = Scraper(page, login_manager) # Scraper 생성 시 login_manager 전달
             
-            # 지정된 연도 설정 (예시, 필요시 API 요청으로 받을 수 있도록 확장 가능)
-            target_years = ["2023", "2022", "2021"]
+            # 변경: 모든 연도의 데이터를 가져오기 위해 target_years를 None으로 설정
+            target_years = None
             
             print(f"기업 정보 스크래핑 시작 (BRN: {normalized_brn})...")
             companies_data_list = await scraper.scrape_companies_with_financials(

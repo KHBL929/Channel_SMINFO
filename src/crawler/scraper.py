@@ -377,24 +377,27 @@ class Scraper:
                 MIN_CELLS_PER_ROW = max(COL_IDX_YEAR, COL_IDX_REVENUE, COL_IDX_OPERATING_PROFIT) + 1
 
                 if len(cells) < MIN_CELLS_PER_ROW:
-                    print(f"행에 충분한 셀이 없습니다 ({len(cells)}/{MIN_CELLS_PER_ROW}). 건너<0xEB><0x9B><0x84>.")
+                    print(f"DEBUG: 행에 충분한 셀이 없습니다 ({len(cells)}/{MIN_CELLS_PER_ROW}). 건너<0xEB><0x9B><0x84>.")
                     continue
 
                 year_text = cells[COL_IDX_YEAR].get_text(strip=True)
+                print(f"DEBUG: Raw year_text from cell: '{year_text}'")
                 current_row_year = year_text.split("-")[0].strip() if "-" in year_text else year_text.strip()
+                print(f"DEBUG: Parsed current_row_year: '{current_row_year}', isdigit(): {current_row_year.isdigit()}, len: {len(current_row_year)}")
                 
                 if not current_row_year.isdigit() or len(current_row_year) != 4:
-                    print(f"유효하지 않은 연도 형식: '{year_text}' -> '{current_row_year}'. 건너<0xEB><0x9B><0x84>.")
+                    print(f"유효하지 않은 연도 형식 감지: '{year_text}' 에서 파싱된 연도 '{current_row_year}'. 이 행을 건너<0xEB><0x9B><0x84>니다.")
                     continue
 
-                # 수정 시작: target_years가 None이거나 비어있으면 모든 연도를 처리, 아니면 필터링
-                process_this_year = True  # 기본적으로 모든 연도 처리
-                if target_years:  # target_years가 None이 아니거나 비어있지 않은 경우에만 필터링
+                process_this_year = True 
+                if target_years: 
                     if current_row_year not in target_years:
                         process_this_year = False
                 
+                print(f"DEBUG: For year '{current_row_year}', process_this_year is: {process_this_year} (target_years: {target_years})")
+
                 if process_this_year:
-                    found_data_for_any_target_year = True # target_years 필터링과 무관하게 데이터 찾았는지 여부
+                    found_data_for_any_target_year = True
                     revenue_text = cells[COL_IDX_REVENUE].get_text(strip=True)
                     operating_profit_text = cells[COL_IDX_OPERATING_PROFIT].get_text(strip=True)
                     revenue = sanitize_figure(revenue_text)
